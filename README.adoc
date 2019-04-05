@@ -1,0 +1,9 @@
+= Various sbt plugins to assist in Blended Container builds
+:version: 0.1-SNAPSHOT
+
+== License
+
+This project is published under the https://www.apache.org/licenses/LICENSE-2.0[Apache License, Version 2.0]
+
+== Changelog
+
