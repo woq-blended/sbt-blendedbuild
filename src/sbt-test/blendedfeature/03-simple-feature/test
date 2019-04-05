@@ -1,0 +1,4 @@
+# exec verify task which is assumed to test the successful plugin execution
+> package
+$ exists target/features/simple.conf
+$ must-mirror expected/simple.conf target/features/simple.conf
