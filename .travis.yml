@@ -6,6 +6,7 @@ jdk:
 
 before_script:
   - sh -e scripts/build-prereq.sh sbt-filterresources
+  - sh -e scripts/build-prereq.sh sbt-phoenix
 
 script:
   - sbt test scripted publishLocal
