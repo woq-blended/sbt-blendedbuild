@@ -16,14 +16,6 @@ import sbt.librarymanagement.{ModuleID, UnresolvedWarning, UnresolvedWarningConf
 object BlendedDockerContainerPlugin extends AutoPlugin {
 
   object autoImport {
-
-    /**
-     * This object exists, to by-default prefix all tasks.
-     * That way, you can access all task/settings by `BlendedDockerContainer.settings`.
-     * You can also `import BlendedDockerContainer._`
-     * or rename to a short prefix via `import BlendedDockerContainerPlugin.autoImport.{BlendedDockerContainer => BDC}`.
-     */
-    object BlendedDockerContainer {
       val containerImage = taskKey[(String, File)]("The container image and it's folder name")
       val generateDockerfile = taskKey[File]("Generate to dockerfile")
       val createDockerImage = taskKey[Unit]("Create the docker image")
@@ -38,11 +30,10 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
       val imageTag = settingKey[String]("The image tag of the docker image")
       val overlays = settingKey[Seq[File]]("Additional blended container overlays to be applied to the image")
       val env = settingKey[Map[String, String]]("Additional environment variables used when running the overlay builder. Those will not be added to the docker image as ENV entry.")
-      val profile = settingKey[(String, String)]("The profile name and version")
-    }
+      val profile = settingKey[Option[(String, String)]]("The profile name and version, only required when generating overlays")
   }
 
-  import autoImport.BlendedDockerContainer._
+  import autoImport._
 
   override def requires = super.requires &&
     FilterResources &&
@@ -64,6 +55,11 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
     appUser := "blended",
 
     ports := Seq(),
+
+    profile := {
+      if(overlays.value.nonEmpty) sys.error("profile setting must be defined to generate overlays")
+      None
+    },
 
     generateDockerfile := {
       // generate overlays
@@ -165,7 +161,7 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
         if (overlaysContainerDir.exists()) IO.delete(overlaysContainerDir)
         overlaysContainerDir.mkdirs()
 
-        val profileConf = s"${ciName}/profiles/${profile.value._1}/${profile.value._2}/profile.conf"
+        val profileConf = s"${ciName}/profiles/${profile.value.get._1}/${profile.value.get._2}/profile.conf"
 
         // unpack only the profile.conf from the image
         log.info(s"Unpacking profile.conf from image: ${profileConf}")
