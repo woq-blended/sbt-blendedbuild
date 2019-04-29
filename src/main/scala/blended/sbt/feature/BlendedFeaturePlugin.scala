@@ -33,7 +33,6 @@ object BlendedFeaturePlugin extends AutoPlugin {
     },
 
     featureArtifact := {
-      val config = featureConfig.value
       Artifact(
         name = moduleName.value,
         `type` = "conf",

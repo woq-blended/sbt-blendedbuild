@@ -325,8 +325,6 @@ object BlendedContainerPlugin extends AutoPlugin {
     },
 
     packageFullNoJreMapping := {
-      val log = streams.value.log
-
       // trigger
       (Compile / filterResources).value
       materializeProfile.value

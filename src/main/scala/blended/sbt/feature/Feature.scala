@@ -1,7 +1,6 @@
 package blended.sbt.feature
 
-import sbt._
-import sbt.librarymanagement.{Constant, ModuleID}
+import sbt.librarymanagement.ModuleID
 
 case class Feature(name: String, features: Seq[Feature] = Seq(), bundles: Seq[FeatureBundle], featureRefs: Seq[FeatureRef] = Seq()) {
 
