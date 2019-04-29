@@ -9,11 +9,11 @@ import blended.sbt.feature.Feature
 import com.typesafe.config.ConfigFactory
 import com.typesafe.sbt.packager.MappingsHelper
 import com.typesafe.sbt.packager.universal.{Archives, UniversalDeployPlugin, UniversalPlugin}
+import de.wayofquality.sbt.filterresources.FilterResources
+import de.wayofquality.sbt.filterresources.FilterResources.autoImport._
 import sbt._
 import sbt.Keys._
 import sbt.librarymanagement.{Constant, ModuleID, UnresolvedWarning, UnresolvedWarningConfiguration, UpdateConfiguration}
-import de.wayofquality.sbt.filterresources.FilterResources
-import de.wayofquality.sbt.filterresources.FilterResources.autoImport._
 
 object BlendedContainerPlugin extends AutoPlugin {
 
