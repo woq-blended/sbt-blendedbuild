@@ -1,12 +1,12 @@
-package blended.sbt.phoenix
+package blended.sbt.phoenix.docker
 
 import blended.sbt.dockercontainer.BlendedDockerContainerPlugin
 import blended.sbt.dockercontainer.BlendedDockerContainerPlugin.{autoImport => DC}
 import blended.sbt.container.BlendedContainerPlugin.{autoImport => BC}
 import phoenix.ProjectConfig
 import sbt.AutoPlugin
+import sbt.Keys.target
 import sbt._
-import sbt.Keys._
 
 /**
  * You need at least add an sbt-setting for `containerImage`
