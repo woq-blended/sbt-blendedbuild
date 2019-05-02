@@ -16,21 +16,21 @@ import sbt.librarymanagement.{ModuleID, UnresolvedWarning, UnresolvedWarningConf
 object BlendedDockerContainerPlugin extends AutoPlugin {
 
   object autoImport {
-      val containerImage = taskKey[(String, File)]("The container image and it's folder name")
-      val generateDockerfile = taskKey[File]("Generate to dockerfile")
-      val createDockerImage = taskKey[Unit]("Create the docker image")
-      val generateOverlays = taskKey[Option[File]]("Generates to Overlays dir structure. Returns the container directory.")
+    val containerImage = taskKey[(String, File)]("The container image and it's folder name")
+    val generateDockerfile = taskKey[File]("Generate to dockerfile")
+    val createDockerImage = taskKey[Unit]("Create the docker image")
+    val generateOverlays = taskKey[Option[File]]("Generates to Overlays dir structure. Returns the container directory.")
 
-      val dockerDir = settingKey[File]("The base directory for the docker image content")
-      val maintainer = settingKey[String]("The maintainer of the docker image")
-      val baseImage = settingKey[String]("The name of the base image (The FROM line in the Dockerfile)")
-      val appFolder = settingKey[String]("The folder of target app (under /opt)")
-      val appUser = settingKey[String]("The user who owns the application folder")
-      val ports = settingKey[Seq[Int]]("The exposed ports")
-      val imageTag = settingKey[String]("The image tag of the docker image")
-      val overlays = settingKey[Seq[File]]("Additional blended container overlays to be applied to the image")
-      val env = settingKey[Map[String, String]]("Additional environment variables used when running the overlay builder. Those will not be added to the docker image as ENV entry.")
-      val profile = settingKey[Option[(String, String)]]("The profile name and version, only required when generating overlays")
+    val dockerDir = settingKey[File]("The base directory for the docker image content")
+    val maintainer = settingKey[String]("The maintainer of the docker image")
+    val baseImage = settingKey[String]("The name of the base image (The FROM line in the Dockerfile)")
+    val appFolder = settingKey[String]("The folder of target app (under /opt)")
+    val appUser = settingKey[String]("The user who owns the application folder")
+    val ports = settingKey[Seq[Int]]("The exposed ports")
+    val imageTag = settingKey[String]("The image tag of the docker image")
+    val overlays = settingKey[Seq[File]]("Additional blended container overlays to be applied to the image")
+    val env = settingKey[Map[String, String]]("Additional environment variables used when running the overlay builder. Those will not be added to the docker image as ENV entry.")
+    val profile = settingKey[Option[(String, String)]]("The profile name and version, only required when generating overlays")
   }
 
   import autoImport._
@@ -57,62 +57,74 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
     ports := Seq(),
 
     profile := {
-      if(overlays.value.nonEmpty) sys.error("profile setting must be defined to generate overlays")
+      if (overlays.value.nonEmpty) sys.error("profile setting must be defined to generate overlays")
       None
     },
 
     generateDockerfile := {
-      // generate overlays
-      val overlaysDockerCmd = generateOverlays.value match {
-        case None => "# no overlays configured"
-        case Some(_) => "ADD overlays /opt"
-      }
 
-      // make Dockerfile
+        // generate overlays
+        val overlaysDockerCmd = generateOverlays.value match {
+          case None => "# no overlays configured"
+          case Some(_) => "ADD overlays /opt"
+        }
 
-      val dockerfile = dockerDir.value / "Dockerfile"
+        // make Dockerfile
 
-      val dockerconf = Seq(
-        s"FROM ${baseImage.value}",
-        s"MAINTAINER ${maintainer.value}",
-        s"ADD ${containerImage.value._2.getName()} /opt",
-        s"RUN ln -s /opt/${containerImage.value._1} /opt/${appFolder.value}",
-        overlaysDockerCmd,
-        s"RUN chown -R blended.blended /opt/${containerImage.value._1}",
-        s"RUN chown -R blended.blended /opt/${appFolder.value}",
-        s"USER ${appUser.value}",
-        "ENV JAVA_HOME /opt/java",
-        "ENV PATH ${PATH}:${JAVA_HOME}/bin",
-        s"""ENTRYPOINT ["/bin/sh", "/opt/${appFolder.value}/bin/blended.sh"]"""
-      ) ++
-        ports.value.map(p => s"EXPOSE ${p}")
+        val dockerfile = dockerDir.value / "Dockerfile"
 
-      IO.write(dockerfile, dockerconf.mkString("\n"))
+        val dockerconf = Seq(
+          s"FROM ${baseImage.value}",
+          s"MAINTAINER ${maintainer.value}",
+          s"ADD ${containerImage.value._2.getName()} /opt",
+          s"RUN ln -s /opt/${containerImage.value._1} /opt/${appFolder.value}",
+          overlaysDockerCmd,
+          s"RUN chown -R blended.blended /opt/${containerImage.value._1}",
+          s"RUN chown -R blended.blended /opt/${appFolder.value}",
+          s"USER ${appUser.value}",
+          "ENV JAVA_HOME /opt/java",
+          "ENV PATH ${PATH}:${JAVA_HOME}/bin",
+          s"""ENTRYPOINT ["/bin/sh", "/opt/${appFolder.value}/bin/blended.sh"]"""
+        ) ++
+          ports.value.map(p => s"EXPOSE ${p}")
 
-      dockerfile
+        IO.write(dockerfile, dockerconf.mkString("\n"))
+
+        dockerfile
     },
 
     createDockerImage := {
       val log = streams.value.log
 
       // trigger dockerfile generator
-      generateDockerfile.value
+      val dockerFile = generateDockerfile.value
+      val (imageName, imageFile) = containerImage.value
 
-      // generate overlays
-      generateOverlays.value.foreach { d =>
-        IO.copyDirectory(d, dockerDir.value / "overlays")
-      }
+//      val cached = FileFunction.cached(
+//        cacheBaseDirectory = streams.value.cacheDirectory / "generate-dockerfile",
+//        inStyle = FileInfo.hash,
+//        outStyle = FileInfo.hash
+//      ) { in: Set[File] =>
 
-      // copy container pack into docker dir
-      IO.copyFile(containerImage.value._2, dockerDir.value / containerImage.value._2.getName())
+        // generate overlays
+        generateOverlays.value.foreach { d =>
+          IO.copyDirectory(d, dockerDir.value / "overlays")
+        }
 
-      log.info(s"Creating docker image ${imageTag.value}")
-      Process(
-        command = List("docker", "build", "-t", imageTag.value, "."),
-        cwd = Some(dockerDir.value)
-      ) ! log
-      log.info(s"Created docker image ${imageTag.value}")
+        // copy container pack into docker dir
+        IO.copyFile(imageFile, dockerDir.value / imageFile.getName())
 
+        log.info(s"Creating docker image ${imageTag.value}")
+        Process(
+          command = List("docker", "build", "-t", imageTag.value, "."),
+          cwd = Some(dockerDir.value)
+        ) ! log
+        log.info(s"Created docker image ${imageTag.value}")
+
+//        Set()
+//      }
+//
+//      cached(Set(dockerFile, dockerDir.value, imageName))
     },
 
     BlendedContainerPlugin.autoImport.materializeToolsDeps := Seq(
@@ -173,7 +185,7 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
         // generate extra overlays (see maven updater plugin @add-overlays)
         val profileFile = (overlaysContainerDir / profileConf).getAbsolutePath()
 
-        val overlayArgs = overlays.value.flatMap(o =>          Seq("--add-overlay-file", o.getAbsolutePath()))
+        val overlayArgs = overlays.value.flatMap(o => Seq("--add-overlay-file", o.getAbsolutePath()))
 
         val envArgs = env.value.flatMap { case (k, v) => Seq("--env-var", k, v) }
 
