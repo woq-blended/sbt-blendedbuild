@@ -15,4 +15,6 @@ object Dependencies {
   val sbtNativePackager = Def.setting("com.typesafe.sbt" % "sbt-native-packager" % "1.3.9" withExtraAttributes sbtAttributes.value)
 
   val sbtPhoenix = Def.setting("de.wayofquality.sbt" % "sbt-phoenix" % "0.1-SNAPSHOT" withExtraAttributes sbtAttributes.value)
+
+  val sbtOsgi = Def.setting("com.typesafe.sbt" % "sbt-osgi" % "0.9.5" withExtraAttributes sbtAttributes.value)
 }
