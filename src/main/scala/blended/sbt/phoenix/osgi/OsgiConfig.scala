@@ -8,7 +8,6 @@ import phoenix.ProjectConfig
 import sbt.AutoPlugin
 
 trait OsgiConfig extends ProjectConfig {
-  import OsgiConfig._
 
   /** If `true` (default), this project is packaged as OSGi bundle. */
   def osgi: Boolean = true
@@ -63,7 +62,6 @@ trait OsgiConfig extends ProjectConfig {
         }.dependsOn(Def.task[Unit] {
           // Make sure the classes directory exists before we start bundling
           // to avoid unnecessary bnd errors
-          val log = Keys.streams.value.log
           val classDir = (Compile / Keys.classDirectory).value
           if (!classDir.exists()) {
             Files.createDirectories(classDir.toPath())
