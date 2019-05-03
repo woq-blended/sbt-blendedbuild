@@ -10,6 +10,8 @@ lazy val root = (project in file("."))
 
     licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
 
+    homepage := Some(url("https://github.com/woq-blended/sbt-blendedbuild")),
+
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/woq-blended/sbt-blendedbuild"),
@@ -17,7 +19,7 @@ lazy val root = (project in file("."))
       )
     ),
 
-        developers := List(
+    developers := List(
       Developer(id = "atooni", name = "Andreas Gies", email = "andreas@wayofquality.de", url = url("https://github.com/atooni")),
       Developer(id = "lefou", name = "Tobias Roeser", email = "tobias.roser@tototec.de", url = url("https://github.com/lefou"))
     ),
