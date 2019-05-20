@@ -531,6 +531,7 @@ object BlendedContainerPlugin extends AutoPlugin {
       classifier = "full-nojre"
     ),
 
+    // TODO: check if artifacts with embedded JRE's shall be generated
     artifacts ++= Seq(
       packageDeploymentPackArtifact.value,
       packageFullNoJreTarGzArtifact.value,
@@ -544,7 +545,6 @@ object BlendedContainerPlugin extends AutoPlugin {
         packageFullNoJreTarGzArtifact.value -> packageFullNoJreTarGz.value
       )
     }
-
   )
 
   def moduleIdToGav(dep: ModuleID): String = {

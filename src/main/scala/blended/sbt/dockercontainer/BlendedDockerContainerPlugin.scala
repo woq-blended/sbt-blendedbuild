@@ -176,7 +176,7 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
         val profileConf = s"${ciName}/profiles/${profile.value.get._1}/${profile.value.get._2}/profile.conf"
 
         // unpack only the profile.conf from the image
-        log.info(s"Unpacking profile.conf from image: ${profileConf}")
+        log.info(s"Unpacking [$profileConf] from image: [${ciFile.getAbsolutePath()}]")
         Process(
           command = List("tar", "xzf", ciFile.getAbsolutePath(), profileConf),
           cwd = overlaysContainerDir
@@ -197,7 +197,7 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
           "--create-launch-config", (overlaysContainerDir / ciName / "launch.conf").getAbsolutePath()
         ) ++ overlayArgs ++ envArgs
 
-        log.info(s"Generating overlays with args: ${builderArgs}")
+        log.info(s"Generating overlays with args: [${builderArgs}]")
         val cl = new URLClassLoader(materializeToolsCp.value.map(_.toURI().toURL()).toArray, null)
 
         val builder = cl.loadClass("blended.updater.tools.configbuilder.RuntimeConfigBuilder")
