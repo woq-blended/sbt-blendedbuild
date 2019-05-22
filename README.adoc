@@ -7,10 +7,14 @@ This project is published under the https://www.apache.org/licenses/LICENSE-2.0[
 
 == Changelog
 
-=== sbt-blendedbuild 0.1.0 - 2019-05-03
+=== {master}
 
-* Initial public release
+* Improved log messages
 
 === sbt-blendedbuild 0.1.1 - 2019-05-03
 
 * Updated dependency to public release versions
+
+=== sbt-blendedbuild 0.1.0 - 2019-05-03
+
+* Initial public release

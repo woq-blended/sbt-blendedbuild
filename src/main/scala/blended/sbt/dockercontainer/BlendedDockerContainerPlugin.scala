@@ -176,7 +176,7 @@ object BlendedDockerContainerPlugin extends AutoPlugin {
         val profileConf = s"${ciName}/profiles/${profile.value.get._1}/${profile.value.get._2}/profile.conf"
 
         // unpack only the profile.conf from the image
-        log.info(s"Unpacking [$profileConf] from image: [${ciFile.getAbsolutePath()}]")
+        log.info(s"Unpacking profile.conf at [$profileConf] from image: [${ciFile.getAbsolutePath()}]")
         Process(
           command = List("tar", "xzf", ciFile.getAbsolutePath(), profileConf),
           cwd = overlaysContainerDir
