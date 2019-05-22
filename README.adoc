@@ -1,5 +1,31 @@
 = Various sbt plugins to assist in Blended Container builds
-:version: 0.1.2-SNAPSHOT
+:version: 0.1.2
+
+== Usage
+
+Add this plugin to your `project/plugins.sbt`
+
+[source,scala,subs="attributes"]
+----
+// project/plugins.sbt
+
+addSbtPlugin("de.wayofquality.blended" % "sbt-blendedbuild" % "{version}")
+----
+
+
+== Compatibility
+
+This plugins is only compatible with sbt 1.0 and newer.
+
+
+== Publishing
+
+To publish this plugin, run: 
+
+```
+SONATYPE_USERNAME=<username> SONATYPE_PASSWORD=<password> sbt publish
+```
+
 
 == License
 
@@ -7,9 +33,10 @@ This project is published under the https://www.apache.org/licenses/LICENSE-2.0[
 
 == Changelog
 
-=== {master}
+=== sbt-blendedbuild 0.1.2 - 2019-05-22
 
 * Improved log messages
+* DockerContainer: Fixed used base directory for releative overlays file lookup
 
 === sbt-blendedbuild 0.1.1 - 2019-05-03
 
