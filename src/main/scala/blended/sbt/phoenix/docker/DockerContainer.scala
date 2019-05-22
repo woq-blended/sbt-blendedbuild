@@ -5,7 +5,7 @@ import blended.sbt.dockercontainer.BlendedDockerContainerPlugin.{autoImport => D
 import blended.sbt.container.BlendedContainerPlugin.{autoImport => BC}
 import phoenix.ProjectConfig
 import sbt.AutoPlugin
-import sbt.Keys.target
+import sbt.Keys._
 import sbt._
 
 /**
@@ -41,7 +41,7 @@ trait DockerContainer extends ProjectConfig {
     DC.appFolder := folder,
     DC.imageTag := imageTag,
     DC.ports := ports,
-    DC.overlays := overlays.map(o => target.value / o),
+    DC.overlays := overlays.map(o => baseDirectory.value / o),
     DC.env := env,
     DC.profile := profileName.flatMap(pn => profileVersion.map(pv => pn -> pv)),
     DC.maintainer := maintainer
