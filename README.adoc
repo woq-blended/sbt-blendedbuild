@@ -27,6 +27,9 @@ SONATYPE_USERNAME=<username> SONATYPE_PASSWORD=<password> sbt publish
 ```
 
 
+== Deprectaed 
+
+The functionality of this project has moved to https://github.com/woq-blended/sbt-blendedbuild.
 == License
 
 This project is published under the https://www.apache.org/licenses/LICENSE-2.0[Apache License, Version 2.0]
