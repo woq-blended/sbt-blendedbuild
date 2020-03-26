@@ -41,6 +41,9 @@ object BlendedContainerPlugin extends AutoPlugin {
 
     val materializeOverlays = taskKey[Seq[File]]("Additional overlays that should be applied to the materialized profile")
 
+    val archiveBaseName = settingKey[String]("The base name for all the packaged artefacts")
+    val topLevelArchiveDirectory = settingKey[Option[String]]("The top level directory to be used in the packaged archives")
+
     val packageFullNoJreMapping = taskKey[Seq[(File, String)]]("Mapping for product package without a JRE")
     val packageFullNoJreZipArtifact = settingKey[Artifact]("Artifact")
     val packageFullNoJreZip = taskKey[File]("Create a product package without a JRE")
@@ -426,6 +429,9 @@ object BlendedContainerPlugin extends AutoPlugin {
     packageJreWindowsArchive := (None, None),
     packageJreLinuxArchive := (None, None),
 
+    archiveBaseName := s"${profileName.value}-${version.value}",
+    topLevelArchiveDirectory := Some(s"${profileName.value}-${version.value}"),
+
     packageFullJreWindowsZip := {
       if (packageJreWindowsArchive.value._1.isEmpty) {
         throw new RuntimeException("No JRE defined via 'packageJreWindowsArchive'")
@@ -433,12 +439,11 @@ object BlendedContainerPlugin extends AutoPlugin {
 
       validateMapping(packageFullJreWindowsMapping.value, streams.value.log)
 
-      val outputName = s"${profileName.value}-${version.value}-full-jre-windows"
       Archives.makeZip(
         target = target.value,
-        name = outputName,
+        name = archiveBaseName.value + "-full-jre-windows",
         mappings = packageFullJreWindowsMapping.value,
-        top = Some(s"${profileName.value}-${version.value}"),
+        top = topLevelArchiveDirectory.value,
         options = Nil
       )
     },
@@ -450,24 +455,22 @@ object BlendedContainerPlugin extends AutoPlugin {
 
       validateMapping(packageFullJreLinuxMapping.value, streams.value.log)
 
-      val outputName = s"${profileName.value}-${version.value}-full-jre-linux"
       Archives.makeTarball(Archives.gzip, ".tar.gz")(
         target = target.value,
-        name = outputName,
+        name = archiveBaseName.value + "-full-jre-linux",
         mappings = packageFullJreLinuxMapping.value,
-        top = Some(s"${profileName.value}-${version.value}")
+        top = topLevelArchiveDirectory.value
       )
     },
 
     packageFullNoJreZip := {
       validateMapping(packageFullNoJreMapping.value, streams.value.log)
 
-      val outputName = s"${profileName.value}-${version.value}-full-nojre"
       Archives.makeZip(
         target = target.value,
-        name = outputName,
+        name = archiveBaseName.value + "-full-nojre",
         mappings = packageFullNoJreMapping.value,
-        top = Some(s"${profileName.value}-${version.value}"),
+        top = topLevelArchiveDirectory.value,
         options = Nil
       )
     },
@@ -475,12 +478,11 @@ object BlendedContainerPlugin extends AutoPlugin {
     packageFullNoJreTarGz := {
       validateMapping(packageFullNoJreMapping.value, streams.value.log)
 
-      val outputName = s"${profileName.value}-${version.value}-full-nojre"
       Archives.makeTarball(Archives.gzip, ".tar.gz")(
         target = target.value,
-        name = outputName,
+        name = archiveBaseName.value + "-full-nojre",
         mappings = packageFullNoJreMapping.value,
-        top = Some(s"${profileName.value}-${version.value}")
+        top = topLevelArchiveDirectory.value
       )
     },
 
